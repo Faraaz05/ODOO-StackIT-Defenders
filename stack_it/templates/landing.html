@@ -60,50 +60,6 @@
             min-height: 100vh;
         }
 
-        /* User bar */
-        .user-bar {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-
-        .user-welcome {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 12px 20px;
-            border-radius: 25px;
-            color: white;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .user-welcome:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .login-btn {
-            background: linear-gradient(45deg, #2d6cdf, #667eea);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(45, 108, 223, 0.3);
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(45, 108, 223, 0.4);
-        }
-
         /* Top bar */
         .top-bar {
             background: rgba(255, 255, 255, 0.95);
@@ -117,8 +73,11 @@
             justify-content: space-between;
             gap: 20px;
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(-20px);
             width: 100%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .logo {
@@ -198,6 +157,37 @@
         }
 
         .search-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 108, 223, 0.4);
+        }
+
+        /* User actions */
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .user-welcome {
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        .login-btn {
+            background: linear-gradient(45deg, #2d6cdf, #667eea);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(45, 108, 223, 0.3);
+            white-space: nowrap;
+        }
+
+        .login-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(45, 108, 223, 0.4);
         }
@@ -423,11 +413,32 @@
                 padding: 15px 20px;
             }
 
+            .logo {
+                width: 100%;
+                justify-content: center;
+            }
+
             .search-form {
                 width: 100%;
                 max-width: none;
                 margin: 0;
                 flex-wrap: wrap;
+            }
+
+            .search-form input,
+            .search-form select {
+                width: 100%;
+            }
+
+            .search-form button {
+                width: 100%;
+            }
+
+            .user-actions {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 10px;
             }
 
             .site-name {
@@ -451,11 +462,6 @@
                 font-size: 0.9rem;
             }
 
-            .user-bar {
-                top: 15px;
-                right: 15px;
-            }
-
             .questions-list {
                 padding: 0 15px;
             }
@@ -477,82 +483,80 @@
     <!-- Floating particles -->
     <div class="particles" id="particles"></div>
 
-    <!-- User bar -->
-    <div class="user-bar" id="user-bar">
-        {% if username %}
-            <span class="user-welcome">Welcome, {{ username }}!</span>
-            <a href="{% url 'logout' %}" class="login-btn">Logout</a>
-        {% else %}
-            <a href="{% url 'login' %}" class="login-btn">Login</a>
-        {% endif %}
-    </div>
-
     <!-- Main container -->
     <div class="landing-container">
         <!-- Top bar -->
         <div class="top-bar" id="top-bar">
-            <div class="logo">
-                <img src="{% static 'images/logo.png' %}" alt="StackIt Logo" height="40">
-                <span class="site-name">StackIt</span>
-            </div>
-            <form class="search-form" method="get" action="{% url 'landing' %}">
-                <input type="text" name="q" placeholder="Search questions..." value="{{ request.GET.q }}">
-                <input type="text" name="tag" placeholder="Search tags..." value="{{ request.GET.tag }}">
-                <select name="sort">
-                    <option value="new" {% if request.GET.sort == "new" %}selected{% endif %}>Newest</option>
-                    <option value="old" {% if request.GET.sort == "old" %}selected{% endif %}>Oldest</option>
-                    <option value="upvotes" {% if request.GET.sort == "upvotes" %}selected{% endif %}>Upvotes (High)</option>
-                    <option value="downvotes" {% if request.GET.sort == "downvotes" %}selected{% endif %}>Upvotes (Low)</option>
-                </select>
-                <button type="submit">Search</button>
-            </form>
+        <div class="logo">
+            <img src="{% static 'images/logo.png' %}" alt="StackIt Logo" height="40">
+            <span class="site-name">StackIt</span>
         </div>
+        <form class="search-form" method="get" action="{% url 'landing' %}">
+            <input type="text" name="q" placeholder="Search questions..." value="{{ request.GET.q }}">
+            <input type="text" name="tag" placeholder="Search tags..." value="{{ request.GET.tag }}">
+            <select name="sort">
+                <option value="new" {% if request.GET.sort == "new" %}selected{% endif %}>Newest</option>
+                <option value="old" {% if request.GET.sort == "old" %}selected{% endif %}>Oldest</option>
+                <option value="upvotes" {% if request.GET.sort == "upvotes" %}selected{% endif %}>Upvotes (High)</option>
+                <option value="downvotes" {% if request.GET.sort == "downvotes" %}selected{% endif %}>Upvotes (Low)</option>
+            </select>
+            <button type="submit">Search</button>
+        </form>
+        <div class="user-actions">
+            {% if username %}
+                <span class="user-welcome">Welcome, {{ username }}!</span>
+                <a href="{% url 'logout' %}" class="login-btn">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="login-btn">Login</a>
+            {% endif %}
+        </div>
+    </div>
 
         <!-- Questions list -->
         <div class="questions-list" id="questions-list">
-            {% for question in questions %}
+        {% for question in questions %}
                 <div class="question-card card-loading" data-index="{{ forloop.counter0 }}">
-                    <a href="{% url 'question_detail' question.id %}">
-                        <h3>{{ question.title }}</h3>
-                    </a>
-                    <div class="meta">
+                <a href="{% url 'question_detail' question.id %}">
+                    <h3>{{ question.title }}</h3>
+                </a>
+                <div class="meta">
                         <span>{{ question.created_at|date:"Y-m-d H:i" }}</span>
-                        <span class="vote-group" id="q-vote-group-{{ question.id }}">
+                    <span class="vote-group" id="q-vote-group-{{ question.id }}">
                             <span id="q-votes-{{ question.id }}">{{ question.net_votes|default:"0" }}</span>
-                            <span>votes</span>
-                            {% if username %}
-                                <button class="vote-btn {% if user_votes|dict_get:question.id == 1 %}voted-up{% endif %}" onclick="vote('question', {{ question.id }}, 1)">▲</button>
-                                <button class="vote-btn {% if user_votes|dict_get:question.id == -1 %}voted-down{% endif %}" onclick="vote('question', {{ question.id }}, -1)">▼</button>
-                            {% else %}
-                                <button class="vote-btn" onclick="window.location='{% url 'login' %}'">▲</button>
-                                <button class="vote-btn" onclick="window.location='{% url 'login' %}'">▼</button>
-                            {% endif %}
-                        </span>
-                        <span>{{ question.answer_count|default:0 }} answers</span>
-                    </div>
-                    <div class="tags">
-                        {% for tag in question.tags_list %}
-                            <span class="tag">{{ tag }}</span>
-                        {% endfor %}
-                    </div>
+                        <span>votes</span>
+                        {% if username %}
+                            <button class="vote-btn {% if user_votes|dict_get:question.id == 1 %}voted-up{% endif %}" onclick="vote('question', {{ question.id }}, 1)">▲</button>
+                            <button class="vote-btn {% if user_votes|dict_get:question.id == -1 %}voted-down{% endif %}" onclick="vote('question', {{ question.id }}, -1)">▼</button>
+                        {% else %}
+                            <button class="vote-btn" onclick="window.location='{% url 'login' %}'">▲</button>
+                            <button class="vote-btn" onclick="window.location='{% url 'login' %}'">▼</button>
+                        {% endif %}
+                    </span>
+                    <span>{{ question.answer_count|default:0 }} answers</span>
                 </div>
-            {% empty %}
+                <div class="tags">
+                    {% for tag in question.tags_list %}
+                        <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% empty %}
                 <div class="empty-state">
-                    <p>No questions found.</p>
+            <p>No questions found.</p>
                 </div>
-            {% endfor %}
-        </div>
+        {% endfor %}
+    </div>
 
         <!-- Pagination -->
         <div class="pagination" id="pagination">
-            {% if questions.has_previous %}
-                <a href="?page={{ questions.previous_page_number }}{{ querystring }}">Previous</a>
-            {% endif %}
-            <span>Page {{ questions.number }} of {{ questions.paginator.num_pages }}</span>
-            {% if questions.has_next %}
-                <a href="?page={{ questions.next_page_number }}{{ querystring }}">Next</a>
-            {% endif %}
-        </div>
+        {% if questions.has_previous %}
+            <a href="?page={{ questions.previous_page_number }}{{ querystring }}">Previous</a>
+        {% endif %}
+        <span>Page {{ questions.number }} of {{ questions.paginator.num_pages }}</span>
+        {% if questions.has_next %}
+            <a href="?page={{ questions.next_page_number }}{{ querystring }}">Next</a>
+        {% endif %}
+    </div>
     </div>
 
     <!-- Ask question button -->
@@ -589,27 +593,15 @@
 
         // Page entrance animations
         function initPageAnimations() {
-            // User bar animation
-            gsap.fromTo('#user-bar', 
-                { opacity: 0, y: -10 },
-                { 
-                    opacity: 1, 
-                    y: 0, 
-                    duration: 0.4, 
-                    ease: "power2.out",
-                    delay: 0.1
-                }
-            );
-
             // Top bar animation
             gsap.fromTo('#top-bar', 
-                { opacity: 0, y: 20 },
+                { opacity: 0, y: -20 },
                 { 
                     opacity: 1, 
                     y: 0, 
                     duration: 0.5, 
                     ease: "power2.out",
-                    delay: 0.2
+                    delay: 0.1
                 }
             );
 

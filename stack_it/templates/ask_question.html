@@ -376,8 +376,8 @@
 
         <!-- Form container -->
         <div class="form-container" id="form-container">
-            <form id="question-form" method="post" action="{% url 'ask_question' %}">
-                {% csrf_token %}
+    <form id="question-form" method="post" action="{% url 'ask_question' %}">
+        {% csrf_token %}
                 
                 <!-- Title field -->
                 <div class="form-group" id="title-group">
@@ -439,8 +439,8 @@
     <script>
         tinymce.init({
             selector: '#editor',
-            plugins: 'lists link image emoticons code fullscreen',
-            toolbar: 'undo redo | bold italic strikethrough | bullist numlist | alignleft aligncenter alignright | link image emoticons code | fullscreen',
+            plugins: 'lists link image emoticons code',
+            toolbar: 'undo redo | bold italic strikethrough | bullist numlist | alignleft aligncenter alignright | link image emoticons code',
             menubar: false,
             height: 250,
             skin: 'oxide',

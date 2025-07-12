@@ -1,193 +1,441 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - StackIt</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #0f3460 0%, #1e5799 25%, #2989d8 50%, #207cca 75%, #7db9e8 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .auth-container {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+        /* Animated particles */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float-particle 15s infinite linear;
+        }
+
+        .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 20%; animation-delay: 2s; }
+        .particle:nth-child(3) { left: 30%; animation-delay: 4s; }
+        .particle:nth-child(4) { left: 40%; animation-delay: 6s; }
+        .particle:nth-child(5) { left: 50%; animation-delay: 8s; }
+        .particle:nth-child(6) { left: 60%; animation-delay: 10s; }
+        .particle:nth-child(7) { left: 70%; animation-delay: 12s; }
+        .particle:nth-child(8) { left: 80%; animation-delay: 14s; }
+
+        @keyframes float-particle {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            width: 100%;
+            max-width: 1200px;
+            min-height: 750px;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            opacity: 0;
+            transform: scale(0.9) translateY(50px);
+            animation: containerEntry 1s ease-out 0.5s forwards;
+        }
+
+        @keyframes containerEntry {
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .form-section {
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .welcome-section {
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(45deg, #1e3c72 0%, #2a5298 50%, #4facfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 10s ease infinite;
+            color: white;
+            width: 50%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .sign-in-form {
+            display: flex;
+            flex-direction: column;
             width: 100%;
             max-width: 400px;
-            margin: 20px;
         }
-        
-        .auth-header {
+
+        .sign-in-form > * {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+
+        @keyframes slideInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-weight: 300;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            font-size: 2.2em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             text-align: center;
+            position: relative;
+        }
+
+        h2 {
+            font-weight: 300;
             margin-bottom: 30px;
+            color: white;
+            font-size: 2.2em;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
-        
-        .auth-header h1 {
-            color: #2d6cdf;
-            margin: 0 0 10px 0;
-            font-size: 2em;
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
-        
-        .auth-header p {
-            color: #666;
-            margin: 0;
-        }
-        
+
         .form-group {
             margin-bottom: 20px;
+            width: 100%;
+            position: relative;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #333;
+            color: #2c3e50;
             font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.5px;
         }
-        
-        .form-group input {
+
+        input {
+            background: rgba(248, 249, 250, 0.9);
+            border: 2px solid rgba(233, 236, 239, 0.8);
+            border-radius: 12px;
+            padding: 14px 18px;
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-            box-sizing: border-box;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
         }
-        
-        .form-group input:focus {
+
+        input:focus {
             outline: none;
-            border-color: #2d6cdf;
+            border-color: #4facfe;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 
+                0 0 0 4px rgba(79, 172, 254, 0.1),
+                0 8px 25px rgba(79, 172, 254, 0.15);
+            transform: translateY(-2px);
         }
-        
-        .form-group input.error {
-            border-color: #e74c3c;
-        }
-        
+
         .error-message {
             color: #e74c3c;
             font-size: 14px;
             margin-top: 5px;
             display: block;
         }
-        
-        .general-error {
-            background: #fdf2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        
-        .submit-btn {
-            width: 100%;
-            background: #2d6cdf;
-            color: white;
+
+        button {
+            border-radius: 25px;
             border: none;
-            padding: 14px;
-            border-radius: 8px;
+            background: linear-gradient(45deg, #1e3c72 0%, #2a5298 50%, #4facfe 100%);
+            background-size: 200% 200%;
+            color: white;
             font-size: 16px;
             font-weight: 600;
+            padding: 15px 40px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        
-        .submit-btn:hover {
-            background: #1e4bb8;
-        }
-        
-        .auth-links {
-            text-align: center;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+            animation: gradientShift 3s ease infinite;
             margin-top: 20px;
         }
-        
-        .auth-links a {
-            color: #2d6cdf;
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(79, 172, 254, 0.4);
+            background-position: right center;
+        }
+
+        .btn-transparent {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            color: white;
+            backdrop-filter: blur(10px);
+            animation: none;
+        }
+
+        .btn-transparent:hover {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1e3c72;
+        }
+
+        .social-login {
+            margin: 15px 0;
+            width: 100%;
+        }
+
+        .social-btn {
+            background: rgba(255, 255, 255, 0.95);
+            color: #2c3e50;
+            border: 2px solid rgba(233, 236, 239, 0.8);
+            margin: 5px 0;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            width: 100%;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            color: #7f8c8d;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(127, 140, 141, 0.3), transparent);
+        }
+
+        .divider span {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .signup-link {
+            color: #4facfe;
             text-decoration: none;
             font-size: 14px;
+            margin-top: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
         }
-        
-        .auth-links a:hover {
+
+        .signup-link:hover {
             text-decoration: underline;
         }
-        
-        .back-link {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .back-link:hover {
-            text-decoration: underline;
+
+        @media (max-width: 768px) {
+            .container {
+                max-width: 400px;
+                flex-direction: column;
+                min-height: auto;
+            }
+            
+            .form-section, .welcome-section {
+                width: 100%;
+                padding: 40px 30px;
+            }
+
+            .welcome-section {
+                order: -1;
+            }
         }
     </style>
 </head>
 <body>
-    <a href="{% url 'landing' %}" class="back-link">← Back to Questions</a>
-    
-    <div class="auth-container">
-        <div class="auth-header">
-            <h1>Welcome Back</h1>
-            <p>Sign in to your StackIt account</p>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="container">
+        <div class="form-section">
+            <form class="sign-in-form" method="post">
+                {% csrf_token %}
+                <h1>Welcome Back</h1>
+                
+                <div class="social-login">
+                    <button type="button" class="social-btn">📧 Sign in with Google</button>
+                    <button type="button" class="social-btn">📘 Sign in with Facebook</button>
+                </div>
+                
+                <div class="divider">
+                    <span>or use your account</span>
+                </div>
+
+                {% if errors.general %}
+                    <div class="error-message">{{ errors.general }}</div>
+                {% endif %}
+                
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        value="{{ form_data.username|default:'' }}"
+                        placeholder="Enter your username"
+                        required
+                    >
+                    {% if errors.username %}
+                        <span class="error-message">{{ errors.username }}</span>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Enter your password"
+                        required
+                    >
+                    {% if errors.password %}
+                        <span class="error-message">{{ errors.password }}</span>
+                    {% endif %}
+                </div>
+                
+                <button type="submit">Sign In</button>
+                <a href="{% url 'signup' %}" class="signup-link">Don't have an account? Sign Up</a>
+            </form>
         </div>
-        
-        {% if errors.general %}
-            <div class="general-error">
-                {{ errors.general }}
+
+        <div class="welcome-section">
+            <div class="welcome-content">
+                <h2>Hello Friend!</h2>
+                <p>Enter your personal details and start your journey with us</p>
+                <button class="btn-transparent" onclick="window.location.href='{% url 'signup' %}'">Create Account</button>
             </div>
-        {% endif %}
-        
-        <form method="post">
-            {% csrf_token %}
-            
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input 
-                    type="text" 
-                    id="username" 
-                    name="username" 
-                    value="{{ form_data.username|default:'' }}"
-                    {% if errors.username %}class="error"{% endif %}
-                    placeholder="Enter your username"
-                >
-                {% if errors.username %}
-                    <span class="error-message">{{ errors.username }}</span>
-                {% endif %}
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    {% if errors.password %}class="error"{% endif %}
-                    placeholder="Enter your password"
-                >
-                {% if errors.password %}
-                    <span class="error-message">{{ errors.password }}</span>
-                {% endif %}
-            </div>
-            
-            <button type="submit" class="submit-btn">Sign In</button>
-        </form>
-        
-        <div class="auth-links">
-            <a href="{% url 'signup' %}">Don't have an account? Sign Up</a>
         </div>
     </div>
+
+    <script>
+        // Input focus animations
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Form submission animation
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            const button = this.querySelector('button[type="submit"]');
+            button.style.opacity = '0.8';
+            button.textContent = 'Signing In...';
+        });
+
+        // Social login buttons
+        const socialButtons = document.querySelectorAll('.social-btn');
+        socialButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const provider = this.textContent.includes('Google') ? 'Google' : 'Facebook';
+                alert(`${provider} sign-in will be implemented soon!`);
+            });
+        });
+    </script>
 </body>
 </html>

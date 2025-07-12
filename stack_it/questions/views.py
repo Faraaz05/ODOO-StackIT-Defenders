@@ -13,9 +13,6 @@ if TYPE_CHECKING:
 
 @login_required
 def ask_question(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    
     if request.method == 'POST':
         title = request.POST.get('title')
         description = request.POST.get('description')
