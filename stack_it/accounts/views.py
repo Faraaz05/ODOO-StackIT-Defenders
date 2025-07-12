@@ -32,10 +32,6 @@ def landing(request):
         downvotes=Coalesce(Sum('vote__value', filter=Q(vote__vote_type='question', vote__value=-1)), V(0)),
         answer_count=Coalesce(Count('answers'), V(0))
     )
-    
-    # Add net votes calculation
-    for question in questions:
-        question.net_votes = question.upvotes - abs(question.downvotes)
 
     # Sorting
     if sort == 'new':
@@ -50,6 +46,11 @@ def landing(request):
     paginator = Paginator(questions, 10)
     page_number = request.GET.get('page')
     questions_page = paginator.get_page(page_number)
+    
+    # Add net votes calculation on the paginated results
+    for question in questions_page:
+        question.net_votes = question.upvotes + question.downvotes
+        print(f"Question {question.id}: upvotes={question.upvotes}, downvotes={question.downvotes}, net_votes={question.net_votes}")
 
     # For tag display
     for q in questions_page:

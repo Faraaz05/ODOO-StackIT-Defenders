@@ -60,7 +60,7 @@
                 <div class="meta">
                     <span>{{ question.created_at|date:"Y-m-d H:i" }}</span> |
                     <span class="vote-group" id="q-vote-group-{{ question.id }}">
-                        <span id="q-votes-{{ question.id }}">{{ question.net_votes }}</span>
+                        <span id="q-votes-{{ question.id }}">{{ question.net_votes|default:"0" }}</span>
                         <span>votes</span>
                         {% if username %}
                             <button class="vote-btn {% if user_votes|dict_get:question.id == 1 %}voted-up{% endif %}" onclick="vote('question', {{ question.id }}, 1)">▲</button>
