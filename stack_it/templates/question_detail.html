@@ -3,9 +3,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="{% static 'js/main.js' %}"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ question.title }} - StackIt</title>
-        <!-- TinyMCE CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="{% static 'js/main.js' %}"></script>
+    <!-- TinyMCE CDN -->
     <script src="https://cdn.tiny.cloud/1/7f0ull290e6398ey3ik26k09o35omr4pwj8oqqpz2w9g0sau/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
       tinymce.init({
@@ -17,17 +20,201 @@
       });
     </script>
     <style>
-        .vote-group { display: inline-flex; align-items: center; gap: 2px; }
-        .tag { background: #e3eaff; color: #2d6cdf; border-radius: 4px; padding: 2px 8px; margin-right: 5px; font-size: 0.9em; }
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        a {
+            color: #2563eb;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-bottom: 16px;
+            color: #111827;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin: 30px 0 20px;
+            color: #111827;
+        }
+
+        h4 {
+            font-size: 1.25rem;
+            margin: 25px 0 15px;
+            color: #111827;
+        }
+
+        .question-meta {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+
+        .vote-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f3f4f6;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .vote-count {
+            font-weight: 600;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .vote-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #9ca3af;
+            transition: all 0.2s;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .vote-btn:hover {
+            background: #e5e7eb;
+            color: #4b5563;
+        }
+
+        .voted-up {
+            color: #10b981 !important;
+        }
+
+        .voted-down {
+            color: #ef4444 !important;
+        }
+
+        .tags-container {
+            margin: 16px 0 24px;
+        }
+
+        .tag {
+            background: #e0e7ff;
+            color: #3b82f6;
+            border-radius: 20px;
+            padding: 4px 12px;
+            margin-right: 8px;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .question-content {
+            margin: 24px 0;
+            padding: 16px 0;
+            border-top: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #e5e7eb;
+            margin: 30px 0;
+        }
+
+        .answer-card {
+            background: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .answer-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+
+        .answer-author {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .answer-content {
+            margin: 16px 0;
+        }
+
+        .answer-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        button[type="submit"] {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            margin-top: 12px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #2563eb;
+        }
+
+        .login-prompt {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
-    <a href="{% url 'landing' %}">← Back to Questions</a>
+    <a href="{% url 'landing' %}" class="back-link">← Back to Questions</a>
+    
     <h2>{{ question.title }}</h2>
-    <div>
-        <span>{{ question.created_at|date:"Y-m-d H:i" }}</span> |
+    
+    <div class="question-meta">
+        <span>Asked on {{ question.created_at|date:"Y-m-d H:i" }}</span>
         <span class="vote-group" id="q-vote-group-{{ question.id }}">
-            <span id="q-votes-{{ question.id }}">{{ question_net_votes|default:0 }}</span>
+            <span class="vote-count" id="q-votes-{{ question.id }}">{{ question_net_votes|default:0 }}</span>
             <span>votes</span>
             {% if user.is_authenticated %}
                 <button class="vote-btn" onclick="vote('question', {{ question.id }}, 1)">▲</button>
@@ -38,35 +225,43 @@
             {% endif %}
         </span>
     </div>
-    <div>
+    
+    <div class="tags-container">
         <strong>Tags:</strong>
         {% for tag in tags_list %}
-    <span class="tag">{{ tag }}</span>
-{% endfor %}
+            <span class="tag">{{ tag }}</span>
+        {% endfor %}
     </div>
-    <div style="margin: 20px 0;">
+    
+    <div class="question-content">
         {{ question.description|safe }}
     </div>
+    
     <hr>
+    
     <h3>Answers</h3>
+    
     {% for answer in answers %}
-        <div class="answer-card" style="background:#fff; margin-bottom:15px; padding:15px; border-radius:6px;">
-            <div>
-                <span><strong>{{ answer.author.username }}</strong> | {{ answer.created_at|date:"Y-m-d H:i" }}</span>
+        <div class="answer-card">
+            <div class="answer-meta">
+                <span class="answer-author">{{ answer.author.username }}</span>
+                <span>Answered on {{ answer.created_at|date:"Y-m-d H:i" }}</span>
             </div>
-            <div style="margin:10px 0;">{{ answer.description|safe }}</div>
-            <div>
-                <span class="vote-group" id="a-vote-group-{{ answer.id }}">
-                    <span id="a-votes-{{ answer.id }}">{{ answer.net_votes|default:0 }}</span>
-                    <span>votes</span>
-                    {% if user.is_authenticated %}
-                        <button class="vote-btn {% if answer_votes|dict_get:answer.id == 1 %}voted-up{% endif %}" onclick="vote('answer', {{ answer.id }}, 1)">▲</button>
-                        <button class="vote-btn {% if answer_votes|dict_get:answer.id == -1 %}voted-down{% endif %}" onclick="vote('answer', {{ answer.id }}, -1)">▼</button>
-                    {% else %}
-                        <button class="vote-btn" onclick="window.location='{% url 'login' %}'">▲</button>
-                        <button class="vote-btn" onclick="window.location='{% url 'login' %}'">▼</button>
-                    {% endif %}
-                </span>
+            
+            <div class="answer-content">
+                {{ answer.description|safe }}
+            </div>
+            
+            <div class="vote-group" id="a-vote-group-{{ answer.id }}">
+                <span class="vote-count" id="a-votes-{{ answer.id }}">{{ answer.net_votes|default:0 }}</span>
+                <span>votes</span>
+                {% if user.is_authenticated %}
+                    <button class="vote-btn {% if answer_votes|dict_get:answer.id == 1 %}voted-up{% endif %}" onclick="vote('answer', {{ answer.id }}, 1)">▲</button>
+                    <button class="vote-btn {% if answer_votes|dict_get:answer.id == -1 %}voted-down{% endif %}" onclick="vote('answer', {{ answer.id }}, -1)">▼</button>
+                {% else %}
+                    <button class="vote-btn" onclick="window.location='{% url 'login' %}'">▲</button>
+                    <button class="vote-btn" onclick="window.location='{% url 'login' %}'">▼</button>
+                {% endif %}
             </div>
         </div>
     {% empty %}
@@ -74,16 +269,21 @@
     {% endfor %}
 
     {% if user.is_authenticated %}
-    <hr>
-    <h4>Your Answer</h4>
-    <form method="post">
-        {% csrf_token %}
-        <label for="answer-editor">Your Answer:</label><br>
-        <textarea id="answer-editor" name="description"></textarea><br><br>
-        <button type="submit">Post Answer</button>
-    </form>
+        <hr>
+        
+        <div class="answer-form">
+            <h4>Your Answer</h4>
+            <form method="post">
+                {% csrf_token %}
+                <label for="answer-editor">Your Answer:</label>
+                <textarea id="answer-editor" name="description"></textarea>
+                <button type="submit">Post Answer</button>
+            </form>
+        </div>
     {% else %}
-        <p><a href="{% url 'login' %}">Login</a> to post an answer.</p>
+        <div class="login-prompt">
+            <p><a href="{% url 'login' %}">Login</a> to post an answer.</p>
+        </div>
     {% endif %}
 </body>
 </html>
