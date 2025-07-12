@@ -38,38 +38,36 @@ StackIt is a minimalist question-and-answer platform that encourages collaborati
 
 ---
 
-## 📁 Folder Structure (Key Modules)
-
 stack_it/
+├── accounts/                  # User authentication and profiles
+│   ├── migrations/
+│   ├── admin.py
+│   ├── models.py
+│   ├── views.py
+│   └── ...
 │
-├── accounts/ # User authentication and profiles
-│ ├── migrations/
-│ ├── admin.py
-│ ├── models.py
-│ ├── views.py
-│ └── ...
+├── questions/                 # Question and answer logic
+│   ├── migrations/
+│   ├── management/
+│   ├── templatetags/
+│   ├── models.py
+│   └── ...
 │
-├── questions/ # Question and answer logic
-│ ├── migrations/
-│ ├── management/
-│ ├── templatetags/
-│ ├── models.py
-│ └── ...
+├── static/                    # Static assets
+│   ├── css/
+│   ├── images/
+│   └── js/
 │
-├── static/ # Static assets
-│ ├── css/
-│ ├── images/
-│ └── js/
+├── templates/                 # HTML templates
+│   ├── ask_question.html
+│   ├── question_detail.html
+│   ├── login.html
+│   └── ...
 │
-├── templates/ # HTML templates
-│ ├── ask_question.html
-│ ├── question_detail.html
-│ ├── login.html
-│ └── ...
-│
-├── db.sqlite3 # Default SQLite database
-├── manage.py # Django management script
-└── settings.py # Project configurations
+├── db.sqlite3                 # Default SQLite database
+├── manage.py                  # Django management script
+└── settings.py                # Project configurations
+
 ## 🧪 How to Run Locally
 
 1. **Clone the repository:**
