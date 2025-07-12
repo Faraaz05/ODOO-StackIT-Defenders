@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', landing, name='landing'),
     path('accounts/', include('accounts.urls')),
+    path('questions/', include('questions.urls')),
 ]
 
 if settings.DEBUG:
