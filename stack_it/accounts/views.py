@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import UserCreationForm
 from .forms import SignUpForm, LoginForm
 from questions.models import Question
 from django.core.paginator import Paginator
@@ -80,28 +83,94 @@ def landing(request):
     })
 
 def signup_view(request):
+    errors = {}
     if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.role = 'user'  # Ensure role is always 'user'
-            user.save()
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        password1 = request.POST.get('password1', '')
+        password2 = request.POST.get('password2', '')
+        
+        # Validation
+        if not username:
+            errors['username'] = 'Username is required.'
+        elif len(username) < 3:
+            errors['username'] = 'Username must be at least 3 characters long.'
+        elif len(username) > 150:
+            errors['username'] = 'Username must be 150 characters or fewer.'
+        else:
+            # Check if username already exists
+            from .models import User
+            if User.objects.filter(username=username).exists():
+                errors['username'] = 'A user with that username already exists.'
+        
+        if not email:
+            errors['email'] = 'Email is required.'
+        elif '@' not in email:
+            errors['email'] = 'Enter a valid email address.'
+        else:
+            # Check if email already exists
+            from .models import User
+            if User.objects.filter(email=email).exists():
+                errors['email'] = 'A user with that email already exists.'
+        
+        if not password1:
+            errors['password1'] = 'Password is required.'
+        elif len(password1) < 8:
+            errors['password1'] = 'Password must be at least 8 characters long.'
+        else:
+            try:
+                validate_password(password1)
+            except ValidationError as e:
+                errors['password1'] = '; '.join(str(msg) for msg in e.messages)
+        
+        if not password2:
+            errors['password2'] = 'Please confirm your password.'
+        elif password1 != password2:
+            errors['password2'] = 'The two password fields didn\'t match.'
+        
+        # If no errors, create user
+        if not errors:
+            from .models import User
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password1,
+                role='user'
+            )
             login(request, user)
             return redirect('landing')
-    else:
-        form = SignUpForm()
-    return render(request, 'signup.html', {'form': form})
+    
+    return render(request, 'signup.html', {
+        'errors': errors,
+        'form_data': request.POST if request.method == 'POST' else {}
+    })
 
 def login_view(request):
+    errors = {}
     if request.method == 'POST':
-        form = LoginForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect('landing')
-    else:
-        form = LoginForm()
-    return render(request, 'login.html', {'form': form})
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+        
+        # Validation
+        if not username:
+            errors['username'] = 'Username is required.'
+        
+        if not password:
+            errors['password'] = 'Password is required.'
+        
+        # If no validation errors, try to authenticate
+        if not errors:
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('landing')
+            else:
+                errors['general'] = 'Invalid username or password.'
+    
+    return render(request, 'login.html', {
+        'errors': errors,
+        'form_data': request.POST if request.method == 'POST' else {}
+    })
 
 def logout_view(request):
     logout(request)
