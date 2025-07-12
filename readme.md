@@ -36,7 +36,7 @@ StackIt is a minimalist question-and-answer platform that encourages collaborati
 - **Admin Panel:** Django Admin
 - **Deployment-ready:** Yes
 
-<pre lang="markdown"> ``` stack_it/ ├── accounts/ # User authentication and profiles │ ├── migrations/ │ ├── admin.py │ ├── models.py │ ├── views.py │ └── ... │ ├── questions/ # Question and answer logic │ ├── migrations/ │ ├── management/ │ ├── templatetags/ │ ├── models.py │ └── ... │ ├── static/ # Static assets │ ├── css/ │ ├── images/ │ └── js/ │ ├── templates/ # HTML templates │ ├── ask_question.html │ ├── question_detail.html │ ├── login.html │ └── ... │ ├── db.sqlite3 # Default SQLite database ├── manage.py # Django management script └── settings.py # Project configurations ``` </pre>
+
 
 ## 🧪 How to Run Locally
 
@@ -45,3 +45,29 @@ StackIt is a minimalist question-and-answer platform that encourages collaborati
    ```bash
    git clone https://github.com/Faraaz05/ODOO-StackIT-Defenders.git
    cd stackit
+2. **Create and activate virtual environment**
+
+   python -m venv env
+   source env/bin/activate  # Windows: env\Scripts\activate
+3. **Install requirements**
+   pip install -r requirements.txt
+
+4. **Run migrations and start server**
+   python manage.py migrate
+   python manage.py runserver
+
+   
+---
+
+### ✅ Now What?
+
+Just save this as your `README.md` in the root folder of your project and push it to GitHub:
+
+```bash
+git add README.md
+git commit -m "Added professional README file"
+git push origin main
+
+
+
+
