@@ -4,33 +4,714 @@
 <head>
     <title>Ask a Question - StackIt</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <!-- GSAP CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <!-- TinyMCE CDN -->
-<script src="https://cdn.tiny.cloud/1/7f0ull290e6398ey3ik26k09o35omr4pwj8oqqpz2w9g0sau/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>    <script>
-      tinymce.init({
-        selector: '#editor',
-        plugins: 'lists link image emoticons',
-        toolbar: 'undo redo | bold italic strikethrough | bullist numlist | alignleft aligncenter alignright | link image emoticons',
-        menubar: false,
-        height: 200
-      });
-    </script>
+    <script src="https://cdn.tiny.cloud/1/7f0ull290e6398ey3ik26k09o35omr4pwj8oqqpz2w9g0sau/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Floating particles background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Main container */
+        .ask-container {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Header section */
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .header-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-bottom: 15px;
+            position: relative;
+            letter-spacing: -0.02em;
+        }
+
+        .header-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(45deg, #2d6cdf, #667eea);
+            border-radius: 2px;
+        }
+
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 400;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Form container */
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        /* Form groups */
+        .form-group {
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        .form-group:nth-child(even) {
+            transform: translateX(30px);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .form-label::before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            background: linear-gradient(45deg, #2d6cdf, #667eea);
+            border-radius: 50%;
+        }
+
+        /* Input styles */
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #2d6cdf;
+            box-shadow: 0 0 0 3px rgba(45, 108, 223, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-input::placeholder {
+            color: #a0aec0;
+        }
+
+        /* Character counter */
+        .char-counter {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .counter-text {
+            font-weight: 500;
+        }
+
+        .counter-bar {
+            width: 100px;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .counter-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #2d6cdf, #667eea);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        /* Submit button */
+        .submit-section {
+            text-align: center;
+            margin-top: 40px;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #2d6cdf, #667eea);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(45, 108, 223, 0.3);
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(45, 108, 223, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* Back link */
+        .back-link {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: 12px 20px;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-15px);
+        }
+
+        /* Loading animation */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #2d6cdf;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .ask-container {
+                padding: 20px 15px;
+            }
+
+            .header-title {
+                font-size: 2.5rem;
+            }
+
+            .form-container {
+                padding: 30px 20px;
+            }
+
+            .back-link {
+                top: 20px;
+                left: 20px;
+                font-size: 1rem;
+                padding: 10px 15px;
+            }
+        }
+
+        /* TinyMCE customization */
+        .tox-tinymce {
+            border-radius: 12px !important;
+            border: 2px solid #e2e8f0 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .tox-tinymce:focus-within {
+            border-color: #2d6cdf !important;
+            box-shadow: 0 0 0 3px rgba(45, 108, 223, 0.1) !important;
+        }
+
+        /* Success animation */
+        .success-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(34, 197, 94, 0.95);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 12px;
+            font-weight: 600;
+            z-index: 1001;
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
-    <h2>Ask a Question</h2>
-    <form id="question-form" method="post" action="{% url 'ask_question' %}">
-        {% csrf_token %}
-        <label for="title">Title:</label><br>
-        <input type="text" id="title" name="title" maxlength="200" required class="form-input"><br><br>
+    <!-- Floating particles -->
+    <div class="particles" id="particles"></div>
 
-        <label for="description">Description:</label><br>
-        <textarea id="editor" name="description"></textarea><br><br>
+    <!-- Loading overlay -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+    </div>
 
-        <label for="tags">Tags (comma separated):</label><br>
-        <input type="text" id="tags" name="tags" placeholder="e.g. React, JWT" class="form-input"><br><br>
+    <!-- Success message -->
+    <div class="success-animation" id="success-msg">
+        Question posted successfully! 🎉
+    </div>
 
-        <button type="submit">Post Question</button>
-    </form>
-    <a href="{% url 'landing' %}">Back to Home</a>
+    <!-- Back link -->
+    <a href="{% url 'landing' %}" class="back-link" id="back-link">
+        ← Back to Questions
+    </a>
+
+    <!-- Main container -->
+    <div class="ask-container">
+        <!-- Header section -->
+        <div class="header-section" id="header-section">
+            <h1 class="header-title">Ask a Question</h1>
+            <p class="header-subtitle">Share your knowledge and help others learn</p>
+        </div>
+
+        <!-- Form container -->
+        <div class="form-container" id="form-container">
+            <form id="question-form" method="post" action="{% url 'ask_question' %}">
+                {% csrf_token %}
+                
+                <!-- Title field -->
+                <div class="form-group" id="title-group">
+                    <label for="title" class="form-label">Question Title</label>
+                    <input 
+                        type="text" 
+                        id="title" 
+                        name="title" 
+                        maxlength="200" 
+                        required 
+                        class="form-input"
+                        placeholder="What's your question? Be specific..."
+                    >
+                    <div class="char-counter">
+                        <span class="counter-text">Keep it clear and concise</span>
+                        <div class="counter-bar">
+                            <div class="counter-fill" id="title-counter"></div>
+                        </div>
+                        <span class="counter-text" id="title-count">0/200</span>
+                    </div>
+                </div>
+
+                <!-- Description field -->
+                <div class="form-group" id="description-group">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea 
+                        id="editor" 
+                        name="description"
+                        placeholder="Provide detailed context for your question..."
+                    ></textarea>
+                </div>
+
+                <!-- Tags field -->
+                <div class="form-group" id="tags-group">
+                    <label for="tags" class="form-label">Tags</label>
+                    <input 
+                        type="text" 
+                        id="tags" 
+                        name="tags" 
+                        class="form-input"
+                        placeholder="e.g. react, javascript, django, python"
+                    >
+                    <div class="char-counter">
+                        <span class="counter-text">Use relevant tags to help others find your question</span>
+                    </div>
+                </div>
+
+                <!-- Submit section -->
+                <div class="submit-section" id="submit-section">
+                    <button type="submit" class="submit-btn" id="submit-btn">
+                        <span class="btn-text">Post Question</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Initialize TinyMCE -->
+    <script>
+        tinymce.init({
+            selector: '#editor',
+            plugins: 'lists link image emoticons code fullscreen',
+            toolbar: 'undo redo | bold italic strikethrough | bullist numlist | alignleft aligncenter alignright | link image emoticons code | fullscreen',
+            menubar: false,
+            height: 250,
+            skin: 'oxide',
+            content_css: 'default',
+            branding: false,
+            elementpath: false,
+            resize: false,
+            setup: function(editor) {
+                editor.on('init', function() {
+                    // Animate editor after initialization
+                    gsap.to('#description-group', {
+                        opacity: 1,
+                        x: 0,
+                        duration: 0.8,
+                        ease: "power2.out",
+                        delay: 0.6
+                    });
+                });
+            }
+        });
+    </script>
+
+    <!-- GSAP Animations -->
+    <script>
+        // Register ScrollTrigger plugin
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Page entrance animations
+        function initPageAnimations() {
+            // Header animation
+            gsap.fromTo('#header-section', 
+                { opacity: 0, y: 30 },
+                { 
+                    opacity: 1, 
+                    y: 0, 
+                    duration: 1.2, 
+                    ease: "power2.out",
+                    delay: 0.2
+                }
+            );
+
+            // Form container animation
+            gsap.fromTo('#form-container', 
+                { opacity: 0, y: 50, scale: 0.95 },
+                { 
+                    opacity: 1, 
+                    y: 0, 
+                    scale: 1, 
+                    duration: 1.2, 
+                    ease: "power2.out",
+                    delay: 0.4
+                }
+            );
+
+            // Form groups staggered animation
+            gsap.fromTo('.form-group', 
+                { opacity: 0, x: -30 },
+                { 
+                    opacity: 1, 
+                    x: 0, 
+                    duration: 0.8, 
+                    ease: "power2.out",
+                    stagger: 0.2,
+                    delay: 0.8
+                }
+            );
+
+            // Submit section animation
+            gsap.fromTo('#submit-section', 
+                { opacity: 0, y: 30 },
+                { 
+                    opacity: 1, 
+                    y: 0, 
+                    duration: 0.8, 
+                    ease: "power2.out",
+                    delay: 1.4
+                }
+            );
+
+            // Back link animation
+            gsap.fromTo('#back-link', 
+                { opacity: 0, x: -20 },
+                { 
+                    opacity: 1, 
+                    x: 0, 
+                    duration: 0.8, 
+                    ease: "power2.out",
+                    delay: 0.6
+                }
+            );
+        }
+
+        // Character counter animation
+        function updateCharacterCounter(input, counter, maxLength) {
+            const currentLength = input.value.length;
+            const percentage = (currentLength / maxLength) * 100;
+            
+            gsap.to(counter, {
+                width: percentage + '%',
+                duration: 0.3,
+                ease: "power2.out"
+            });
+
+            document.getElementById(input.id + '-count').textContent = `${currentLength}/${maxLength}`;
+        }
+
+        // Form interactions
+        function initFormInteractions() {
+            const titleInput = document.getElementById('title');
+            const titleCounter = document.getElementById('title-counter');
+
+            // Title character counter
+            titleInput.addEventListener('input', function() {
+                updateCharacterCounter(this, titleCounter, 200);
+                
+                // Add focus animation
+                gsap.to(this, {
+                    scale: 1.02,
+                    duration: 0.2,
+                    ease: "power2.out"
+                });
+            });
+
+            titleInput.addEventListener('blur', function() {
+                gsap.to(this, {
+                    scale: 1,
+                    duration: 0.2,
+                    ease: "power2.out"
+                });
+            });
+
+            // Form submission animation
+            document.getElementById('question-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loading animation
+                const loading = document.getElementById('loading');
+                loading.style.display = 'flex';
+                
+                gsap.to(loading, {
+                    opacity: 1,
+                    duration: 0.3
+                });
+
+                // Simulate form submission (replace with actual submission)
+                setTimeout(() => {
+                    gsap.to(loading, {
+                        opacity: 0,
+                        duration: 0.3,
+                        onComplete: () => {
+                            loading.style.display = 'none';
+                            
+                            // Show success animation
+                            const successMsg = document.getElementById('success-msg');
+                            gsap.to(successMsg, {
+                                opacity: 1,
+                                duration: 0.5,
+                                ease: "power2.out"
+                            });
+
+                            setTimeout(() => {
+                                gsap.to(successMsg, {
+                                    opacity: 0,
+                                    duration: 0.5,
+                                    ease: "power2.out",
+                                    onComplete: () => {
+                                        // Actually submit the form
+                                        this.submit();
+                                    }
+                                });
+                            }, 2000);
+                        }
+                    });
+                }, 1500);
+            });
+
+            // Hover animations for form inputs
+            const formInputs = document.querySelectorAll('.form-input');
+            formInputs.forEach(input => {
+                input.addEventListener('mouseenter', function() {
+                    gsap.to(this, {
+                        y: -2,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+
+                input.addEventListener('mouseleave', function() {
+                    gsap.to(this, {
+                        y: 0,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+            });
+
+            // Submit button hover effects
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.addEventListener('mouseenter', function() {
+                gsap.to(this, {
+                    scale: 1.05,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+
+            submitBtn.addEventListener('mouseleave', function() {
+                gsap.to(this, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+        }
+
+        // Scroll-triggered animations
+        function initScrollAnimations() {
+            // Parallax effect for particles
+            gsap.to('.particle', {
+                y: -50,
+                scrollTrigger: {
+                    trigger: 'body',
+                    start: 'top top',
+                    end: 'bottom bottom',
+                    scrub: true
+                }
+            });
+
+            // Form container parallax
+            gsap.to('#form-container', {
+                y: -30,
+                scrollTrigger: {
+                    trigger: '#form-container',
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: true
+                }
+            });
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            initPageAnimations();
+            initFormInteractions();
+            initScrollAnimations();
+        });
+
+        // Window resize handler
+        window.addEventListener('resize', function() {
+            // Refresh ScrollTrigger on resize
+            ScrollTrigger.refresh();
+        });
+    </script>
+
     <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>
