@@ -18,3 +18,36 @@ button {
 button:hover {
     background: #1a4a8a;
 }
+
+/* Vote button styles */
+.vote-btn {
+    background: none !important;
+    border: none !important;
+    color: #888 !important;
+    font-size: 1.2em;
+    cursor: pointer;
+    margin: 0 2px;
+    padding: 2px 4px !important;
+    border-radius: 3px;
+    transition: color 0.2s ease;
+}
+
+.vote-btn:hover {
+    background: #f0f0f0 !important;
+    color: #666 !important;
+}
+
+.vote-btn:disabled {
+    color: #ccc !important;
+    cursor: not-allowed;
+}
+
+.vote-btn.voted-up {
+    color: #ff4500 !important;
+    font-weight: bold;
+}
+
+.vote-btn.voted-down {
+    color: #7193ff !important;
+    font-weight: bold;
+}

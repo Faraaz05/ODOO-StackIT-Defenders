@@ -1,0 +1,90 @@
+{% load static %}
+{% load dict_get %}
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="{% static 'js/main.js' %}"></script>
+    <title>{{ question.title }} - StackIt</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <!-- TinyMCE CDN -->
+    <script src="https://cdn.tiny.cloud/1/7f0ull290e6398ey3ik26k09o35omr4pwj8oqqpz2w9g0sau/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+      tinymce.init({
+        selector: '#answer-editor',
+        plugins: 'lists link image emoticons',
+        toolbar: 'undo redo | bold italic strikethrough | bullist numlist | alignleft aligncenter alignright | link image emoticons',
+        menubar: false,
+        height: 200
+      });
+    </script>
+    <style>
+        .vote-group { display: inline-flex; align-items: center; gap: 2px; }
+        .tag { background: #e3eaff; color: #2d6cdf; border-radius: 4px; padding: 2px 8px; margin-right: 5px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <a href="{% url 'landing' %}">← Back to Questions</a>
+    <h2>{{ question.title }}</h2>
+    <div>
+        <span>{{ question.created_at|date:"Y-m-d H:i" }}</span> |
+        <span class="vote-group" id="q-vote-group-{{ question.id }}">
+            <span id="q-votes-{{ question.id }}">{{ question_net_votes|default:0 }}</span>
+            <span>votes</span>
+            {% if user.is_authenticated %}
+                <button class="vote-btn" onclick="vote('question', {{ question.id }}, 1)">▲</button>
+                <button class="vote-btn" onclick="vote('question', {{ question.id }}, -1)">▼</button>
+            {% else %}
+                <button class="vote-btn" onclick="window.location='{% url 'login' %}'">▲</button>
+                <button class="vote-btn" onclick="window.location='{% url 'login' %}'">▼</button>
+            {% endif %}
+        </span>
+    </div>
+    <div>
+        <strong>Tags:</strong>
+        {% for tag in tags_list %}
+    <span class="tag">{{ tag }}</span>
+{% endfor %}
+    </div>
+    <div style="margin: 20px 0;">
+        {{ question.description|safe }}
+    </div>
+    <hr>
+    <h3>Answers</h3>
+    {% for answer in answers %}
+        <div class="answer-card" style="background:#fff; margin-bottom:15px; padding:15px; border-radius:6px;">
+            <div>
+                <span><strong>{{ answer.author.username }}</strong> | {{ answer.created_at|date:"Y-m-d H:i" }}</span>
+            </div>
+            <div style="margin:10px 0;">{{ answer.description|safe }}</div>
+            <div>
+                <span class="vote-group" id="a-vote-group-{{ answer.id }}">
+                    <span id="a-votes-{{ answer.id }}">{{ answer.net_votes|default:0 }}</span>
+                    <span>votes</span>
+                    {% if user.is_authenticated %}
+                        <button class="vote-btn {% if answer_votes|dict_get:answer.id == 1 %}voted-up{% endif %}" onclick="vote('answer', {{ answer.id }}, 1)">▲</button>
+                        <button class="vote-btn {% if answer_votes|dict_get:answer.id == -1 %}voted-down{% endif %}" onclick="vote('answer', {{ answer.id }}, -1)">▼</button>
+                    {% else %}
+                        <button class="vote-btn" onclick="window.location='{% url 'login' %}'">▲</button>
+                        <button class="vote-btn" onclick="window.location='{% url 'login' %}'">▼</button>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    {% empty %}
+        <p>No answers yet.</p>
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+    <hr>
+    <h4>Your Answer</h4>
+    <form method="post">
+        {% csrf_token %}
+        <label for="answer-editor">Your Answer:</label><br>
+        <textarea id="answer-editor" name="description"></textarea><br><br>
+        <button type="submit">Post Answer</button>
+    </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">Login</a> to post an answer.</p>
+    {% endif %}
+</body>
+</html>

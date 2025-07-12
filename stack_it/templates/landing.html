@@ -1,14 +1,96 @@
 {% load static %}
+{% load dict_get %}
 <!DOCTYPE html>
 <html>
 <head>
+    <script src="{% static 'js/main.js' %}"></script>
     <title>StackIt - Landing</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        .top-bar { display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 10px 30px; box-shadow: 0 2px 4px #eee; }
+        .logo { display: flex; align-items: center; }
+        .site-name { font-size: 1.5em; font-weight: bold; margin-left: 10px; color: #2d6cdf; }
+        .search-form input, .search-form select { margin: 0 5px; padding: 5px; }
+        .questions-list { margin: 30px auto; max-width: 700px; }
+        .question-card { background: #fff; margin-bottom: 20px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px #eee; text-align: left; }
+        .question-card h3 { margin: 0 0 10px 0; }
+        .meta { color: #888; font-size: 0.95em; margin-bottom: 8px; }
+        .tags { margin-top: 8px; }
+        .tag { background: #e3eaff; color: #2d6cdf; border-radius: 4px; padding: 2px 8px; margin-right: 5px; font-size: 0.9em; }
+        .pagination { margin: 30px 0; }
+        .pagination a { margin: 0 10px; color: #2d6cdf; text-decoration: none; }
+        .pagination span { margin: 0 10px; }
+        .user-bar { text-align: right; margin: 10px 30px 0 0; }
+        .login-btn { background: #2d6cdf; color: #fff; border: none; padding: 6px 16px; border-radius: 4px; text-decoration: none; }
+        .vote-group { display: inline-flex; align-items: center; gap: 2px; }
+    </style>
 </head>
 <body>
-    <h1 id="welcome">Welcome, {{ username }}!</h1>
-    <a href="{% url 'logout' %}">Logout</a>
-    <button onclick="showAlert()">Click Me</button>
-    <script src="{% static 'js/main.js' %}"></script>
+    <div class="user-bar">
+        {% if username %}
+            Welcome, {{ username }}!
+            <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="login-btn">Login</a>
+        {% endif %}
+    </div>
+    <div class="top-bar">
+        <div class="logo">
+            <img src="{% static 'images/logo.png' %}" alt="StackIt Logo" height="40">
+            <span class="site-name">StackIt</span>
+        </div>
+        <form class="search-form" method="get" action="{% url 'landing' %}">
+            <input type="text" name="q" placeholder="Search questions..." value="{{ request.GET.q }}">
+            <input type="text" name="tag" placeholder="Search tags..." value="{{ request.GET.tag }}">
+            <select name="sort">
+                <option value="new" {% if request.GET.sort == "new" %}selected{% endif %}>Newest</option>
+                <option value="old" {% if request.GET.sort == "old" %}selected{% endif %}>Oldest</option>
+                <option value="upvotes" {% if request.GET.sort == "upvotes" %}selected{% endif %}>Upvotes (High)</option>
+                <option value="downvotes" {% if request.GET.sort == "downvotes" %}selected{% endif %}>Upvotes (Low)</option>
+            </select>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+    <div class="questions-list">
+        {% for question in questions %}
+            <div class="question-card">
+                <a href="{% url 'question_detail' question.id %}">
+                    <h3>{{ question.title }}</h3>
+                </a>
+                <div class="meta">
+                    <span>{{ question.created_at|date:"Y-m-d H:i" }}</span> |
+                    <span class="vote-group" id="q-vote-group-{{ question.id }}">
+                        <span id="q-votes-{{ question.id }}">{{ question.net_votes }}</span>
+                        <span>votes</span>
+                        {% if username %}
+                            <button class="vote-btn {% if user_votes|dict_get:question.id == 1 %}voted-up{% endif %}" onclick="vote('question', {{ question.id }}, 1)">▲</button>
+                            <button class="vote-btn {% if user_votes|dict_get:question.id == -1 %}voted-down{% endif %}" onclick="vote('question', {{ question.id }}, -1)">▼</button>
+                        {% else %}
+                            <button class="vote-btn" onclick="window.location='{% url 'login' %}'">▲</button>
+                            <button class="vote-btn" onclick="window.location='{% url 'login' %}'">▼</button>
+                        {% endif %}
+                    </span>
+                    |
+                    <span>{{ question.answer_count|default:0 }} answers</span>
+                </div>
+                <div class="tags">
+                    {% for tag in question.tags_list %}
+                        <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% empty %}
+            <p>No questions found.</p>
+        {% endfor %}
+    </div>
+    <div class="pagination">
+        {% if questions.has_previous %}
+            <a href="?page={{ questions.previous_page_number }}{{ querystring }}">Previous</a>
+        {% endif %}
+        <span>Page {{ questions.number }} of {{ questions.paginator.num_pages }}</span>
+        {% if questions.has_next %}
+            <a href="?page={{ questions.next_page_number }}{{ querystring }}">Next</a>
+        {% endif %}
+    </div>
 </body>
 </html>
